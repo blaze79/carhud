@@ -1,0 +1,23 @@
+[req]
+distinguished_name = req_distinguished_name
+req_extensions = v3_req
+prompt = no
+default_days = 800
+
+[req_distinguished_name]
+countryName = RU
+stateOrProvinceName = Car
+localityName = Creta 2
+organizationName = Black Perl
+commonName = 192.168.50.81
+emailAddress = webmaster@example.com
+
+[v3_req]
+subjectAltName = @alt_names
+basicConstraints    = critical, CA:TRUE
+keyUsage = critical, digitalSignature, keyEncipherment, keyCertSign, cRLSign
+
+[alt_names]
+IP.1 = 192.168.50.81
+
+
