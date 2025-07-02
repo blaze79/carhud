@@ -170,6 +170,39 @@
         "color": "#DDAA99"
     },
     {
+        "id": "850c85b261c11db1",
+        "type": "subflow",
+        "name": "MqttPayloadFixer",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 100,
+                "y": 100,
+                "wires": [
+                    {
+                        "id": "80454982c478a7e4"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 940,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "29bfd1a71fecd6f6",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "7f7ebb969dd22c89",
         "type": "mqtt-broker",
         "name": "MosquitiTest",
@@ -662,7 +695,7 @@
         "type": "switch",
         "z": "28dab5b710dcafa7",
         "name": "",
-        "property": "payload.time > payload.currentTime",
+        "property": "payload.time > payload.shiftedTime",
         "propertyType": "jsonata",
         "rules": [
             {
@@ -690,9 +723,9 @@
         "rules": [
             {
                 "t": "set",
-                "p": "payload.currentTime",
+                "p": "payload.shiftedTime",
                 "pt": "msg",
-                "to": "payload.currentTime - $env(\"timelag\")\t\t",
+                "to": "payload.currentTime - $env(\"timelag\")",
                 "tot": "jsonata"
             }
         ],
@@ -714,7 +747,7 @@
         "type": "function",
         "z": "f1f979193f9116d4",
         "name": "reshapePayload",
-        "func": "var params = {};\nmsg.payload.time = BigInt(msg.payload.time);\nfor(const key in msg.payload) {\n    //node.warn(key);\n    if(key.startsWith(\"k\")) {\n      //node.warn(key);\n      const newKey = key.substring(1) + \"_0\"; \n      params[newKey] = {\n         payload: {\n           pid_value: Number(msg.payload[key]),\n           time: msg.payload.time,\n           pid: newKey\n         }\n       }; \n\n      //node.warn(params[key]);   \n    }\n}\n\n//node.warn(params);\nmsg.payload.params = params;\n//node.warn(msg.payload.params);\nmsg.payload.hasSpeed = !(params[\"d_0\"] === undefined);\n\nreturn msg;",
+        "func": "var params = {};\nmsg.payload.time = BigInt(msg.payload.time);\nfor(const key in msg.payload) {\n    //node.warn(key);\n    if(key.startsWith(\"k\")) {\n      //node.warn(key);\n      const newKey = key.substring(1) + \"_0\"; \n      params[newKey] = {\n         payload: {\n           pid_value: Number(msg.payload[key]),\n           time: msg.payload.time,\n           pid: newKey,\n           source: \"web\"\n         }\n       }; \n\n      //node.warn(params[key]);   \n    }\n}\n\n//node.warn(params);\nmsg.payload.params = params;\n//node.warn(msg.payload.params);\nmsg.payload.hasSpeed = !(params[\"d_0\"] === undefined);\n\nreturn msg;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
@@ -822,6 +855,126 @@
         ]
     },
     {
+        "id": "80454982c478a7e4",
+        "type": "switch",
+        "z": "850c85b261c11db1",
+        "name": "",
+        "property": "payload.pid",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "regex",
+                "v": "22e001_.+",
+                "vt": "str",
+                "case": true
+            },
+            {
+                "t": "regex",
+                "v": "2201a0_.+",
+                "vt": "str",
+                "case": true
+            },
+            {
+                "t": "else"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 250,
+        "y": 100,
+        "wires": [
+            [
+                "7c31b328421bf836"
+            ],
+            [
+                "8388c3c9423112d2"
+            ],
+            [
+                "29bfd1a71fecd6f6"
+            ]
+        ]
+    },
+    {
+        "id": "29bfd1a71fecd6f6",
+        "type": "change",
+        "z": "850c85b261c11db1",
+        "name": "addSource",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.source",
+                "pt": "msg",
+                "to": "mqtt",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 690,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7c31b328421bf836",
+        "type": "change",
+        "z": "850c85b261c11db1",
+        "name": "fixOil",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.pid",
+                "pt": "msg",
+                "to": "22e001_0",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 470,
+        "y": 40,
+        "wires": [
+            [
+                "29bfd1a71fecd6f6"
+            ]
+        ]
+    },
+    {
+        "id": "8388c3c9423112d2",
+        "type": "change",
+        "z": "850c85b261c11db1",
+        "name": "fixAtf",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.pid",
+                "pt": "msg",
+                "to": "2201a0_0",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 470,
+        "y": 100,
+        "wires": [
+            [
+                "29bfd1a71fecd6f6"
+            ]
+        ]
+    },
+    {
         "id": "0d41aec78d60c034",
         "type": "mqtt in",
         "z": "b9513758a28f60ef",
@@ -892,7 +1045,7 @@
         "checkall": "true",
         "repair": false,
         "outputs": 4,
-        "x": 500,
+        "x": 690,
         "y": 260,
         "wires": [
             [
@@ -1304,7 +1457,7 @@
         "type": "debug",
         "z": "b9513758a28f60ef",
         "name": "Http Input Debug",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1497,7 +1650,7 @@
         "type": "debug",
         "z": "b9513758a28f60ef",
         "name": "Too OLD Debug",
-        "active": false,
+        "active": true,
         "tosidebar": true,
         "console": false,
         "tostatus": false,
@@ -1588,7 +1741,7 @@
         "y": 260,
         "wires": [
             [
-                "54520757d5e47dd3"
+                "3bda238857e8e6a5"
             ],
             [
                 "4bd3ed9fc674fe45"
@@ -1638,7 +1791,7 @@
         "id": "3e4fac9e9f3d002d",
         "type": "debug",
         "z": "b9513758a28f60ef",
-        "name": "MQTT Input12",
+        "name": "MQTT Input Local",
         "active": false,
         "tosidebar": true,
         "console": false,
@@ -1647,7 +1800,7 @@
         "targetType": "full",
         "statusVal": "",
         "statusType": "auto",
-        "x": 470,
+        "x": 480,
         "y": 500,
         "wires": []
     },
@@ -1690,7 +1843,7 @@
                 "vt": "str"
             }
         ],
-        "repeat": "1",
+        "repeat": "",
         "crontab": "",
         "once": false,
         "onceDelay": "1",
@@ -1836,7 +1989,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "УСТ",
+                "to": "УС",
                 "tot": "str"
             },
             {
@@ -1871,7 +2024,7 @@
                 "t": "set",
                 "p": "payload",
                 "pt": "msg",
-                "to": "НЕТ",
+                "to": "НЕ",
                 "tot": "str"
             },
             {
@@ -1913,7 +2066,7 @@
         "fontSize": 16,
         "color": "#717171",
         "wrapText": false,
-        "className": "indi-big",
+        "className": "indi-normal",
         "x": 1530,
         "y": 40,
         "wires": []
@@ -1935,9 +2088,40 @@
         "fontSize": 16,
         "color": "#717171",
         "wrapText": false,
-        "className": "indi-big",
+        "className": "indi-normal",
         "x": 1540,
         "y": 80,
+        "wires": []
+    },
+    {
+        "id": "3bda238857e8e6a5",
+        "type": "subflow:850c85b261c11db1",
+        "z": "b9513758a28f60ef",
+        "name": "",
+        "x": 440,
+        "y": 260,
+        "wires": [
+            [
+                "54520757d5e47dd3",
+                "28500f9a05cd6db3"
+            ]
+        ]
+    },
+    {
+        "id": "28500f9a05cd6db3",
+        "type": "debug",
+        "z": "b9513758a28f60ef",
+        "name": "MqttFixedPayload",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 630,
+        "y": 160,
         "wires": []
     },
     {
