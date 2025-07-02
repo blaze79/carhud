@@ -863,6 +863,16 @@
         "propertyType": "msg",
         "rules": [
             {
+                "t": "eq",
+                "v": "0d_0",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
+                "v": "05_0",
+                "vt": "str"
+            },
+            {
                 "t": "regex",
                 "v": "22e001_.+",
                 "vt": "str",
@@ -880,10 +890,16 @@
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 3,
+        "outputs": 5,
         "x": 250,
         "y": 100,
         "wires": [
+            [
+                "3407d0a9d5576e36"
+            ],
+            [
+                "b312605958ff55a2"
+            ],
             [
                 "7c31b328421bf836"
             ],
@@ -914,8 +930,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 690,
-        "y": 160,
+        "x": 750,
+        "y": 340,
         "wires": [
             []
         ]
@@ -939,8 +955,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 470,
-        "y": 40,
+        "x": 490,
+        "y": 120,
         "wires": [
             [
                 "29bfd1a71fecd6f6"
@@ -967,7 +983,61 @@
         "to": "",
         "reg": false,
         "x": 470,
-        "y": 100,
+        "y": 160,
+        "wires": [
+            [
+                "29bfd1a71fecd6f6"
+            ]
+        ]
+    },
+    {
+        "id": "b312605958ff55a2",
+        "type": "change",
+        "z": "850c85b261c11db1",
+        "name": "fixCool",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.pid",
+                "pt": "msg",
+                "to": "5_0",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 490,
+        "y": 80,
+        "wires": [
+            [
+                "29bfd1a71fecd6f6"
+            ]
+        ]
+    },
+    {
+        "id": "3407d0a9d5576e36",
+        "type": "change",
+        "z": "850c85b261c11db1",
+        "name": "fixSpeed",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.pid",
+                "pt": "msg",
+                "to": "d_0",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 500,
+        "y": 40,
         "wires": [
             [
                 "29bfd1a71fecd6f6"
