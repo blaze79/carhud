@@ -1,0 +1,1 @@
+jq "walk(   if type == \"object\" and has(\"mSerializedBundle\")   then .mSerializedBundle |= tojson   else . end )" Mqtt_totq.macro.json 

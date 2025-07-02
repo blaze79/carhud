@@ -1,0 +1,1 @@
+jq ".. | select(type == \"object\" and .m_name? == \"pidid\")" Mqtt_totq.macro.json 
