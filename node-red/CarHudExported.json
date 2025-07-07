@@ -203,6 +203,47 @@
         "color": "#DDAA99"
     },
     {
+        "id": "3daa6cb9b82d87f5",
+        "type": "subflow",
+        "name": "OldDataIndicator",
+        "info": "",
+        "category": "",
+        "in": [
+            {
+                "x": 500,
+                "y": 280,
+                "wires": [
+                    {
+                        "id": "2a006d6f30e87406"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 1300,
+                "y": 160,
+                "wires": [
+                    {
+                        "id": "86e209a0767e9beb",
+                        "port": 0
+                    },
+                    {
+                        "id": "24a605b4e960f8ec",
+                        "port": 0
+                    },
+                    {
+                        "id": "12e1f89e5ddd436a",
+                        "port": 0
+                    }
+                ]
+            }
+        ],
+        "env": [],
+        "meta": {},
+        "color": "#DDAA99"
+    },
+    {
         "id": "7f7ebb969dd22c89",
         "type": "mqtt-broker",
         "name": "MosquitiTest",
@@ -321,7 +362,7 @@
         "height": "8",
         "order": 1,
         "showTitle": false,
-        "className": "indi-group",
+        "className": "indi-group indi-group-id",
         "visible": "true",
         "disabled": "false",
         "groupType": "default"
@@ -1045,6 +1086,219 @@
         ]
     },
     {
+        "id": "e0cd272847523d91",
+        "type": "inject",
+        "z": "3daa6cb9b82d87f5",
+        "name": "Таймер свежести",
+        "props": [
+            {
+                "p": "payload.currentTime",
+                "v": "",
+                "vt": "date"
+            },
+            {
+                "p": "topic",
+                "vt": "str"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "onceDelay": "1",
+        "topic": "",
+        "x": 230,
+        "y": 160,
+        "wires": [
+            [
+                "61e5055843f94b0d"
+            ]
+        ]
+    },
+    {
+        "id": "61e5055843f94b0d",
+        "type": "change",
+        "z": "3daa6cb9b82d87f5",
+        "name": "Фейковый ПИД",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload.pid",
+                "pt": "msg",
+                "to": "6666",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 440,
+        "y": 160,
+        "wires": [
+            [
+                "2a006d6f30e87406"
+            ]
+        ]
+    },
+    {
+        "id": "2a006d6f30e87406",
+        "type": "function",
+        "z": "3daa6cb9b82d87f5",
+        "name": "refreshDataTime",
+        "func": "if (msg.payload.pid == \"6666\") {\n    var lastTime = flow.get(\"lastSpeedDate\");\n    if (lastTime === undefined) {\n        return {\n            payload: {\n                state: 2\n            }\n        };\n    }\n    return buildPayload(msg.payload.currentTime, Number(lastTime));\n} else {\n    const limitedLastTime = Math.min(\n        Date.now() + 20000,\n        Number(msg.payload.time)\n    );\n    flow.set(\"lastSpeedDate\", limitedLastTime);\n    return buildPayload(Date.now(), Number(msg.payload.time));\n}\n\nfunction buildPayload(currentTime, lastTime) {\n    const timeDelta = currentTime - lastTime;\n    return {\n        payload: {\n            state: (timeDelta < 5000 ? 0 : (timeDelta < 20000 ? 1 : 2)),\n            delta: timeDelta\n        }\n    };\n}\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 690,
+        "y": 160,
+        "wires": [
+            [
+                "40c31021c03eb8ca"
+            ]
+        ]
+    },
+    {
+        "id": "40c31021c03eb8ca",
+        "type": "switch",
+        "z": "3daa6cb9b82d87f5",
+        "name": "",
+        "property": "payload.state",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "eq",
+                "v": "0",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "1",
+                "vt": "num"
+            },
+            {
+                "t": "eq",
+                "v": "2",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 3,
+        "x": 910,
+        "y": 160,
+        "wires": [
+            [
+                "86e209a0767e9beb"
+            ],
+            [
+                "24a605b4e960f8ec"
+            ],
+            [
+                "12e1f89e5ddd436a"
+            ]
+        ]
+    },
+    {
+        "id": "86e209a0767e9beb",
+        "type": "change",
+        "z": "3daa6cb9b82d87f5",
+        "name": "Формат норма",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "ui_update.class",
+                "pt": "msg",
+                "to": "normal-data",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1100,
+        "y": 120,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "24a605b4e960f8ec",
+        "type": "change",
+        "z": "3daa6cb9b82d87f5",
+        "name": "Формат УС",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "УС",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "ui_update.class",
+                "pt": "msg",
+                "to": "old-data",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1090,
+        "y": 160,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "12e1f89e5ddd436a",
+        "type": "change",
+        "z": "3daa6cb9b82d87f5",
+        "name": "Формат нет",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "НЕ",
+                "tot": "str"
+            },
+            {
+                "t": "set",
+                "p": "ui_update.class",
+                "pt": "msg",
+                "to": "no-data",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 1090,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
         "id": "0d41aec78d60c034",
         "type": "mqtt in",
         "z": "b9513758a28f60ef",
@@ -1093,6 +1347,11 @@
         "rules": [
             {
                 "t": "eq",
+                "v": "1f_0",
+                "vt": "str"
+            },
+            {
+                "t": "eq",
                 "v": "d_0",
                 "vt": "str"
             },
@@ -1114,13 +1373,16 @@
         ],
         "checkall": "true",
         "repair": false,
-        "outputs": 4,
+        "outputs": 5,
         "x": 690,
         "y": 260,
         "wires": [
             [
+                "58dad1b435130ac5"
+            ],
+            [
                 "c434b5da087acbb0",
-                "2a006d6f30e87406"
+                "58dad1b435130ac5"
             ],
             [
                 "cd2e72451dc5d531"
@@ -1466,10 +1728,10 @@
         "ui": "",
         "name": "Create Button Normal",
         "order": 1,
-        "width": 0,
-        "height": 0,
+        "width": "6",
+        "height": "1",
         "head": "",
-        "format": "<template>\n    <button class=\"my-class\" onclick=\"onMyClick()\">My Button</button>\n</template>\n\n\n<script>    \n\n    window.onMyClick = function () {\n        if(isFullscreen()) {\n            document.exitFullscreen();\n        } else {\n            document.documentElement.requestFullscreen()\n                .then(() => screen.orientation.lock('landscape-primary'))\n                .catch(error => console.error('Failed:', error));\n        }\n    }\n    \n    function isFullscreen() {\n        return !!(\n            document.fullscreenElement || // Стандарт\n            document.webkitFullscreenElement || // Chrome, Safari, Edge\n            document.mozFullScreenElement || // Firefox\n            document.msFullscreenElement // IE11\n        );\n    }\n</script>",
+        "format": "<template>\n    <button class=\"my-class\" onclick=\"onMyClick()\">Full Screen</button>\n</template>\n\n\n<script>    \n\n    window.onMyClick = function () {\n        if(isFullscreen()) {\n            document.exitFullscreen();\n        } else {\n            document.documentElement.requestFullscreen()\n                .then(() => screen.orientation.lock('landscape-primary'))\n                .catch(error => console.error('Failed:', error));\n        }\n    }\n    \n    function isFullscreen() {\n        return !!(\n            document.fullscreenElement || // Стандарт\n            document.webkitFullscreenElement || // Chrome, Safari, Edge\n            document.mozFullScreenElement || // Firefox\n            document.msFullscreenElement // IE11\n        );\n    }\n</script>",
         "storeOutMessages": true,
         "passthru": true,
         "resendOnRefresh": true,
@@ -1898,228 +2160,6 @@
         ]
     },
     {
-        "id": "e0cd272847523d91",
-        "type": "inject",
-        "z": "b9513758a28f60ef",
-        "name": "Таймер свежести",
-        "props": [
-            {
-                "p": "payload.currentTime",
-                "v": "",
-                "vt": "date"
-            },
-            {
-                "p": "topic",
-                "vt": "str"
-            }
-        ],
-        "repeat": "",
-        "crontab": "",
-        "once": false,
-        "onceDelay": "1",
-        "topic": "",
-        "x": 430,
-        "y": 100,
-        "wires": [
-            [
-                "61e5055843f94b0d"
-            ]
-        ]
-    },
-    {
-        "id": "61e5055843f94b0d",
-        "type": "change",
-        "z": "b9513758a28f60ef",
-        "name": "Фейковый ПИД",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload.pid",
-                "pt": "msg",
-                "to": "6666",
-                "tot": "str"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 640,
-        "y": 100,
-        "wires": [
-            [
-                "2a006d6f30e87406"
-            ]
-        ]
-    },
-    {
-        "id": "2a006d6f30e87406",
-        "type": "function",
-        "z": "b9513758a28f60ef",
-        "name": "refreshDataTime",
-        "func": "if (msg.payload.pid == \"6666\") {\n    var lastTime = flow.get(\"lastSpeedDate\");\n    if (lastTime === undefined) {\n        return {\n            payload: {\n                state: 2\n            }\n        };\n    }\n    return buildPayload(msg.payload.currentTime, Number(lastTime));\n} else {\n    \n    flow.set(\"lastSpeedDate\", msg.payload.time);\n    return buildPayload(Date.now(), Number(msg.payload.time));\n}\n\nfunction buildPayload(currentTime, lastTime) {\n    return {\n        payload: {\n            state: currentTime > lastTime + 5000 ? 1 : 0,\n            delta: currentTime - lastTime\n        }\n    };\n}\n",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 890,
-        "y": 100,
-        "wires": [
-            [
-                "40c31021c03eb8ca"
-            ]
-        ]
-    },
-    {
-        "id": "40c31021c03eb8ca",
-        "type": "switch",
-        "z": "b9513758a28f60ef",
-        "name": "",
-        "property": "payload.state",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "0",
-                "vt": "num"
-            },
-            {
-                "t": "eq",
-                "v": "1",
-                "vt": "num"
-            },
-            {
-                "t": "eq",
-                "v": "2",
-                "vt": "num"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 3,
-        "x": 1110,
-        "y": 100,
-        "wires": [
-            [
-                "86e209a0767e9beb"
-            ],
-            [
-                "24a605b4e960f8ec"
-            ],
-            [
-                "12e1f89e5ddd436a"
-            ]
-        ]
-    },
-    {
-        "id": "86e209a0767e9beb",
-        "type": "change",
-        "z": "b9513758a28f60ef",
-        "name": "Формат норма",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "",
-                "tot": "str"
-            },
-            {
-                "t": "set",
-                "p": "ui_update.class",
-                "pt": "msg",
-                "to": "normal-data",
-                "tot": "str"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1300,
-        "y": 20,
-        "wires": [
-            [
-                "ef63359b2560c6cc",
-                "882d92bb610f7df6"
-            ]
-        ]
-    },
-    {
-        "id": "24a605b4e960f8ec",
-        "type": "change",
-        "z": "b9513758a28f60ef",
-        "name": "Формат норма",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "УС",
-                "tot": "str"
-            },
-            {
-                "t": "set",
-                "p": "ui_update.class",
-                "pt": "msg",
-                "to": "old-data",
-                "tot": "str"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1300,
-        "y": 60,
-        "wires": [
-            [
-                "ef63359b2560c6cc",
-                "882d92bb610f7df6"
-            ]
-        ]
-    },
-    {
-        "id": "12e1f89e5ddd436a",
-        "type": "change",
-        "z": "b9513758a28f60ef",
-        "name": "Формат норма",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "НЕ",
-                "tot": "str"
-            },
-            {
-                "t": "set",
-                "p": "ui_update.class",
-                "pt": "msg",
-                "to": "no-data",
-                "tot": "str"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1300,
-        "y": 100,
-        "wires": [
-            [
-                "ef63359b2560c6cc",
-                "882d92bb610f7df6"
-            ]
-        ]
-    },
-    {
         "id": "ef63359b2560c6cc",
         "type": "ui-text",
         "z": "b9513758a28f60ef",
@@ -2193,6 +2233,43 @@
         "x": 630,
         "y": 160,
         "wires": []
+    },
+    {
+        "id": "58dad1b435130ac5",
+        "type": "subflow:3daa6cb9b82d87f5",
+        "z": "b9513758a28f60ef",
+        "x": 1010,
+        "y": 60,
+        "wires": [
+            [
+                "ef63359b2560c6cc",
+                "882d92bb610f7df6"
+            ]
+        ]
+    },
+    {
+        "id": "198e126c9149086e",
+        "type": "ui-template",
+        "z": "b9513758a28f60ef",
+        "group": "946c510ad28c61c6",
+        "page": "",
+        "ui": "",
+        "name": "Create Button HUD",
+        "order": 2,
+        "width": "6",
+        "height": "1",
+        "head": "",
+        "format": "<template>\n    <button class=\"my-class\" onclick=\"onHudClick()\">HUD mode</button>\n</template>\n\n\n<script>    \n\n    window.onHudClick = function () {\n        document.querySelectorAll('.indi-group-id').forEach(element => {\n            if(element.classList.contains('indi-group')) {                \n              element.classList.remove('indi-group');\n            } else {\n              element.classList.add('indi-group');  \n            }\n        });        \n    }    \n    \n</script>",
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 1370,
+        "y": 640,
+        "wires": [
+            []
+        ]
     },
     {
         "id": "94ebf288cc40f604",
