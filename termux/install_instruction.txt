@@ -1,0 +1,8 @@
+	mkdir -p /data/data/com.termux/files/home/.termux/tasker
+	termux-setup-storage
+	cp /data/data/com.termux/files/home/storage/downloads/start_node_red.sh /data/data/com.termux/files/home/.termux/tasker
+	cd /data/data/com.termux/files/home/.termux/tasker
+	ls -l
+	chmod 777 start_node_red.sh 
+
+	
