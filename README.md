@@ -9,6 +9,8 @@ Scripts and setting for black pearl car HUD.
 Весь софт ставится на Android-магнитолу. Вся обработка данных делается в программе Node-Red, отображение так же осуществляется в Node-Red Dashboard 2.0 с поддержкой двух горизонтальной и вертикальной ориентации, при этом горизонтальная ориентация расчитана на "HUD устройство" и зеркально отражает изображение.
 Предложено две схемы работы: основная - с использованием MQTT и резервная, с ипользованием https. Реальные испытания показали, что https схеме неработоспособна из-за ошибок в ПО Torque. 
 
+![Photo](https://lh3.googleusercontent.com/pw/AP1GczPlytDwGoSK-OUCH0OK7y6PeZWJs5i2703IFBjzZayR_KGtKPMFT6TojLAUZNb8HKS6ZZ1v_wJcaqh-PeCRPKxg9MK6_5hDoJQgFtx3mI9Cd2f4aYCclFKX5HVI0Q4U4t1rUXCrsqbvP4sv3OAyD7Fp8Q=w1280-h795-s-no-gm)
+
 ## Основаная схема
 
 В основном варианте данные проходят через следующие программы:
