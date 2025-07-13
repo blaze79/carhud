@@ -5,4 +5,7 @@
 	ls -l
 	chmod 777 start_node_red.sh 
 
+	am start -a android.settings.TEXT_TO_SPEECH_SETTINGS
+	am start -a android.settings.TTS_SETTINGS
+
 	
