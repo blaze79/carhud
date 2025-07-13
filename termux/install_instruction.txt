@@ -7,5 +7,6 @@
 
 	am start -a android.settings.TEXT_TO_SPEECH_SETTINGS
 	am start -a android.settings.TTS_SETTINGS
+	termux-open --activity-settings 'com.android.settings.TEXT_TO_SPEECH_SETTINGS'
 
 	
